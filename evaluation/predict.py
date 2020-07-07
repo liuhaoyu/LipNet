@@ -4,8 +4,8 @@ from lipnet.core.decoders import Decoder
 from lipnet.lipreading.helpers import labels_to_text
 from lipnet.utils.spell import Spell
 from lipnet.model2 import LipNet
-from keras.optimizers import Adam
-from keras import backend as K
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras import backend as K
 import numpy as np
 import sys
 import os
@@ -21,13 +21,13 @@ PREDICT_BEAM_WIDTH  = 200
 PREDICT_DICTIONARY  = os.path.join(CURRENT_PATH,'..','common','dictionaries','grid.txt')
 
 def predict(weight_path, video_path, absolute_max_string_len=32, output_size=28):
-    print "\nLoading data from disk..."
+    print ("\nLoading data from disk...")
     video = Video(vtype='face', face_predictor_path=FACE_PREDICTOR_PATH)
     if os.path.isfile(video_path):
         video.from_video(video_path)
     else:
         video.from_frames(video_path)
-    print "Data loaded.\n"
+    print ("Data loaded.\n")
 
     if K.image_data_format() == 'channels_first':
         img_c, frames_n, img_w, img_h = video.data.shape
@@ -51,6 +51,7 @@ def predict(weight_path, video_path, absolute_max_string_len=32, output_size=28)
     input_length = np.array([len(video.data)])
 
     y_pred         = lipnet.predict(X_data)
+    print(y_pred.shape)
     result         = decoder.decode(y_pred, input_length)[0]
 
     return (video, result)
@@ -64,22 +65,22 @@ if __name__ == '__main__':
         video, result = predict(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
     else:
         video, result = None, ""
+# video, result = predict("C:/Projects/lipnet/evaluation/models/weights10.h5", "C:/Projects/lipnet/evaluation/samples/id23_vcd_priazn.mpg")
+if video is not None:
+    show_video_subtitle(video.face, result)
 
-    if video is not None:
-        show_video_subtitle(video.face, result)
-
-    stripe = "-" * len(result)
-    print ""
-    print " __                   __  __          __      "
-    print "/\\ \\       __        /\\ \\/\\ \\        /\\ \\__   "
-    print "\\ \\ \\     /\\_\\  _____\\ \\ `\\\\ \\     __\\ \\ ,_\\  "
-    print " \\ \\ \\  __\\/\\ \\/\\ '__`\\ \\ , ` \\  /'__`\\ \\ \\/  "
-    print "  \\ \\ \\L\\ \\\\ \\ \\ \\ \\L\\ \\ \\ \\`\\ \\/\\  __/\\ \\ \\_ "
-    print "   \\ \\____/ \\ \\_\\ \\ ,__/\\ \\_\\ \\_\\ \\____\\\\ \\__\\"
-    print "    \\/___/   \\/_/\\ \\ \\/  \\/_/\\/_/\\/____/ \\/__/"
-    print "                  \\ \\_\\                       "
-    print "                   \\/_/                       "
-    print ""
-    print "             --{}- ".format(stripe)
-    print "[ DECODED ] |> {} |".format(result)
-    print "             --{}- ".format(stripe)
+stripe = "-" * len(result)
+print ("")
+print (" __                   __  __          __      ")
+print ("/\\ \\       __        /\\ \\/\\ \\        /\\ \\__   ")
+print ("\\ \\ \\     /\\_\\  _____\\ \\ `\\\\ \\     __\\ \\ ,_\\  ")
+print (" \\ \\ \\  __\\/\\ \\/\\ '__`\\ \\ , ` \\  /'__`\\ \\ \\/  ")
+print ("  \\ \\ \\L\\ \\\\ \\ \\ \\ \\L\\ \\ \\ \\`\\ \\/\\  __/\\ \\ \\_ ")
+print ("   \\ \\____/ \\ \\_\\ \\ ,__/\\ \\_\\ \\_\\ \\____\\\\ \\__\\")
+print ("    \\/___/   \\/_/\\ \\ \\/  \\/_/\\/_/\\/____/ \\/__/")
+print ("                  \\ \\_\\                       ")
+print ("                   \\/_/                       ")
+print ("")
+print ("             --{}- ".format(stripe))
+print ("[ DECODED ] |> {} |".format(result))
+print ("             --{}- ".format(stripe))

@@ -1,12 +1,12 @@
 import os
 import numpy as np
-from keras import backend as K
+from tensorflow.keras import backend as K
 from scipy import ndimage
-from scipy.misc import imresize
+from skimage import transform
 import skvideo.io
 import dlib
 from lipnet.lipreading.aligns import Align
-
+from matplotlib.pyplot import imread
 class VideoAugmenter(object):
     @staticmethod
     def split_words(video, align):
@@ -112,7 +112,7 @@ class Video(object):
 
     def from_frames(self, path):
         frames_path = sorted([os.path.join(path, x) for x in os.listdir(path)])
-        frames = [ndimage.imread(frame_path) for frame_path in frames_path]
+        frames = [imread(frame_path) for frame_path in frames_path]
         self.handle_type(frames)
         return self
 
@@ -177,7 +177,7 @@ class Video(object):
                 normalize_ratio = MOUTH_WIDTH / float(mouth_right - mouth_left)
 
             new_img_shape = (int(frame.shape[0] * normalize_ratio), int(frame.shape[1] * normalize_ratio))
-            resized_img = imresize(frame, new_img_shape)
+            resized_img = transform.resize(frame, new_img_shape)
 
             mouth_centroid_norm = mouth_centroid * normalize_ratio
 

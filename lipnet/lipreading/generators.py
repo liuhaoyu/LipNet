@@ -3,9 +3,9 @@ from lipnet.lipreading.videos import Video
 from lipnet.lipreading.aligns import Align
 from lipnet.helpers.threadsafe import threadsafe_generator
 from lipnet.helpers.list import get_list_safe
-from keras import backend as K
+from tensorflow.keras import backend as K
 import numpy as np
-import keras
+import tensorflow.keras as keras
 import pickle
 import os
 import glob
@@ -90,13 +90,13 @@ class BasicGenerator(keras.callbacks.Callback):
             except AttributeError as err:
                 raise err
             except:
-                print "Error loading video: "+video_path
+                print ("Error loading video: "+video_path)
                 continue
             if K.image_data_format() == 'channels_first' and video.data.shape != (self.img_c,self.frames_n,self.img_w,self.img_h):
-                print "Video "+video_path+" has incorrect shape "+str(video.data.shape)+", must be "+str((self.img_c,self.frames_n,self.img_w,self.img_h))+""
+                print ("Video "+video_path+" has incorrect shape "+str(video.data.shape)+", must be "+str((self.img_c,self.frames_n,self.img_w,self.img_h))+"")
                 continue
             if K.image_data_format() != 'channels_first' and video.data.shape != (self.frames_n,self.img_w,self.img_h,self.img_c):
-                print "Video "+video_path+" has incorrect shape "+str(video.data.shape)+", must be "+str((self.frames_n,self.img_w,self.img_h,self.img_c))+""
+                print ("Video "+video_path+" has incorrect shape "+str(video.data.shape)+", must be "+str((self.frames_n,self.img_w,self.img_h,self.img_c))+"")
                 continue
             video_list.append(video_path)
         return video_list
@@ -104,27 +104,27 @@ class BasicGenerator(keras.callbacks.Callback):
     def enumerate_align_hash(self, video_list):
         align_hash = {}
         for video_path in video_list:
-            video_id = os.path.splitext(video_path)[0].split('/')[-1]
+            video_id = os.path.split(video_path)[1]
             align_path = os.path.join(self.align_path, video_id)+".align"
             align_hash[video_id] = Align(self.absolute_max_string_len, text_to_labels).from_file(align_path)
         return align_hash
 
     def build_dataset(self):
         if os.path.isfile(self.get_cache_path()):
-            print "\nLoading dataset list from cache..."
+            print ("\nLoading dataset list from cache...")
             with open (self.get_cache_path(), 'rb') as fp:
                 self.train_list, self.val_list, self.align_hash = pickle.load(fp)
         else:
-            print "\nEnumerating dataset list from disk..."
-            self.train_list = self.enumerate_videos(os.path.join(self.train_path, '*', '*'))
-            self.val_list   = self.enumerate_videos(os.path.join(self.val_path, '*', '*'))
+            print ("\nEnumerating dataset list from disk...")
+            self.train_list = self.enumerate_videos(os.path.join(self.train_path, '*'))
+            self.val_list   = self.enumerate_videos(os.path.join(self.val_path, '*'))
             self.align_hash = self.enumerate_align_hash(self.train_list + self.val_list)
             with open(self.get_cache_path(), 'wb') as fp:
                 pickle.dump((self.train_list, self.val_list, self.align_hash), fp)
 
-        print "Found {} videos for training.".format(self.training_size)
-        print "Found {} videos for validation.".format(self.validation_size)
-        print ""
+        print ("Found {} videos for training.".format(self.training_size))
+        print ("Found {} videos for validation.".format(self.validation_size))
+        print ("")
 
         np.random.shuffle(self.train_list)
 
@@ -145,7 +145,7 @@ class BasicGenerator(keras.callbacks.Callback):
         source_str = []
         for path in X_data_path:
             video = Video().from_frames(path)
-            align = self.get_align(path.split('/')[-1])
+            align = self.get_align(path.split('\\')[-1])
             video_unpadded_length = video.length
             if self.curriculum is not None:
                 video, align, video_unpadded_length = self.curriculum.apply(video, align)
@@ -176,7 +176,7 @@ class BasicGenerator(keras.callbacks.Callback):
     def next_train(self):
         r = np.random.RandomState(self.random_seed)
         while 1:
-            # print "SI: {}, SE: {}".format(self.cur_train_index.value, self.shared_train_epoch.value)
+            # print ("SI: {}, SE: {}".format(self.cur_train_index.value, self.shared_train_epoch.value)
             with self.cur_train_index.get_lock(), self.shared_train_epoch.get_lock():
                 cur_train_index = self.cur_train_index.value
                 self.cur_train_index.value += self.minibatch_size
@@ -196,17 +196,17 @@ class BasicGenerator(keras.callbacks.Callback):
                 self.process_train_epoch += epoch_differences
                 for i in range(epoch_differences):
                     r.shuffle(self.train_list) # Catch up
-                # print "GENERATOR EPOCH {}".format(self.process_train_epoch)
+                # print ("GENERATOR EPOCH {}".format(self.process_train_epoch)
                 # print self.train_list[0]
-            # print "PI: {}, SI: {}, SE: {}".format(cur_train_index, self.cur_train_index.value, self.shared_train_epoch.value)
+            # print ("PI: {}, SI: {}, SE: {}".format(cur_train_index, self.cur_train_index.value, self.shared_train_epoch.value)
             if self.curriculum is not None and self.curriculum.epoch != self.process_train_epoch:
                 self.update_curriculum(self.process_train_epoch, train=True)
-            # print "Train [{},{}] {}:{}".format(self.process_train_epoch, epoch_differences, cur_train_index,cur_train_index+self.minibatch_size)
+            # print ("Train [{},{}] {}:{}".format(self.process_train_epoch, epoch_differences, cur_train_index,cur_train_index+self.minibatch_size)
             ret = self.get_batch(cur_train_index, self.minibatch_size, train=True)
             # if epoch_differences > 0:
-            #     print "GENERATOR EPOCH {} - {}:{}".format(self.process_train_epoch, cur_train_index, cur_train_index + self.minibatch_size)
+            #     print ("GENERATOR EPOCH {} - {}:{}".format(self.process_train_epoch, cur_train_index, cur_train_index + self.minibatch_size)
             #     print ret[0]['source_str']
-            #     print "-------------------"
+            #     print ("-------------------"
             yield ret
 
     @threadsafe_generator
@@ -219,7 +219,7 @@ class BasicGenerator(keras.callbacks.Callback):
                     self.cur_val_index.value = self.cur_val_index.value % self.minibatch_size
             if self.curriculum is not None and self.curriculum.epoch != self.process_epoch:
                 self.update_curriculum(self.process_epoch, train=False)
-            # print "Val [{}] {}:{}".format(self.process_epoch, cur_val_index,cur_val_index+self.minibatch_size)
+            # print ("Val [{}] {}:{}".format(self.process_epoch, cur_val_index,cur_val_index+self.minibatch_size)
             ret = self.get_batch(cur_val_index, self.minibatch_size, train=False)
             yield ret
 
@@ -234,7 +234,7 @@ class BasicGenerator(keras.callbacks.Callback):
 
     def update_curriculum(self, epoch, train=True):
         self.curriculum.update(epoch, train=train)
-        print "Epoch {}: {}".format(epoch, self.curriculum)
+        print ("Epoch {}: {}".format(epoch, self.curriculum))
 
 
 # datasets/video/<sid>/<id>/<image>.png
@@ -253,11 +253,11 @@ class RandomSplitGenerator(BasicGenerator):
         
     def build_dataset(self):
         if os.path.isfile(self.get_cache_path()):
-            print "\nLoading dataset list from cache..."
+            print ("\nLoading dataset list from cache...")
             with open (self.get_cache_path(), 'rb') as fp:
                 self.train_list, self.val_list, self.align_hash = pickle.load(fp)
         else:
-            print "\nEnumerating dataset list from disk..."
+            print ("\nEnumerating dataset list from disk...")
             video_list = self.enumerate_videos(os.path.join(self.video_path, '*', '*'))
             np.random.shuffle(video_list) # Random the video list before splitting
             if(self.val_split > 1): # If val_split is not a probability
@@ -270,6 +270,6 @@ class RandomSplitGenerator(BasicGenerator):
             with open(self.get_cache_path(), 'wb') as fp:
                 pickle.dump((self.train_list, self.val_list, self.align_hash), fp)
 
-        print "Found {} videos for training.".format(self.training_size)
-        print "Found {} videos for validation.".format(self.validation_size)
-        print ""
+        print ("Found {} videos for training.".format(self.training_size))
+        print ("Found {} videos for validation.".format(self.validation_size))
+        print ("")

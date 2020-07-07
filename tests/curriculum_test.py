@@ -20,12 +20,12 @@ def rules(epoch):
 
 def show_results(_video, _align, video, align):
     show_video_subtitle(frames=_video.face, subtitle=_align.sentence)
-    print "Video: "
+    print ("Video: ")
     print _video.length
     print np.array_equiv(_video.mouth, video.mouth),
     print np.array_equiv(_video.data, video.data),
     print np.array_equiv(_video.face, video.face)
-    print "Align: "
+    print ("Align: ")
     print labels_to_text(_align.padded_label.astype(np.int))
     print _align.padded_label
     print _align.label_length
@@ -40,14 +40,14 @@ video.from_video('evaluation/samples/id2_vcd_swwp2s.mpg')
 
 align = Align(absolute_max_string_len=32, label_func=text_to_labels).from_file('evaluation/samples/swwp2s.align')
 
-print "=== TRAINING ==="
+print ("=== TRAINING ===")
 for i in range(6):
     curriculum.update(i, train=True)
     print curriculum
     _video, _align, _ = curriculum.apply(video, align)
     show_results(_video, _align, video, align)
 
-print "=== VALIDATION/TEST ==="
+print ("=== VALIDATION/TEST ===")
 for i in range(6):
     curriculum.update(i, train=False)
     print curriculum

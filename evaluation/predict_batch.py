@@ -4,8 +4,8 @@ from lipnet.core.decoders import Decoder
 from lipnet.lipreading.helpers import labels_to_text
 from lipnet.utils.spell import Spell
 from lipnet.model2 import LipNet
-from keras.optimizers import Adam
-from keras import backend as K
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras import backend as K
 import numpy as np
 import sys
 import os
@@ -63,13 +63,13 @@ def predicts(weight_path, videos_path, absolute_max_string_len=32, output_size=2
         predict(weight_path, video)
 
 def load(video_path):
-    print "\n[{}]\nLoading data from disk...".format(video_path)
+    print ("\n[{}]\nLoading data from disk...".format(video_path))
     video = Video(vtype='face', face_predictor_path=FACE_PREDICTOR_PATH)
     if os.path.isfile(video_path):
         video.from_video(video_path)
     else:
         video.from_frames(video_path)
-    print "Data loaded.\n"
+    print ("Data loaded.\n")
     return video
 
 if __name__ == '__main__':

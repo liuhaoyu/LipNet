@@ -1,4 +1,4 @@
-from keras import backend as K
+import tensorflow.keras.backend as K
 import numpy as np
 
 def _decode(y_pred, input_length, greedy=True, beam_width=100, top_paths=1):
@@ -26,10 +26,11 @@ def _decode(y_pred, input_length, greedy=True, beam_width=100, top_paths=1):
             Tensor `(top_paths, )` that contains
                 the log probability of each decoded sequence.
     """
+
     decoded = K.ctc_decode(y_pred=y_pred, input_length=input_length,
                            greedy=greedy, beam_width=beam_width, top_paths=top_paths)
-    paths = [path.eval(session=K.get_session()) for path in decoded[0]]
-    logprobs  = decoded[1].eval(session=K.get_session())
+    paths = [path for path in decoded[0]]
+    logprobs  = decoded[1]
 
     return (paths, logprobs)
 

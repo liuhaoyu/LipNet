@@ -1,0 +1,40 @@
+环境安装
+1安装python3.7
+2安装ffmpeg，https://ffmpeg.org/，配环境变量指向/bin目录
+3安装VisualStudio，“workloads”选择“desktop development with C++”
+4安装VSCode
+5打开CMD
+      cd  to/lipnet
+      pip install tensorflow==2.1.0
+      pip install Keras
+      pip install editdistance
+      pip install h5py
+      pip install matplotlib
+      pip install numpy
+      pip install python-dateutil
+      pip install scipy
+      pip install Pillow
+      pip install Theano
+      pip install nltk
+      pip install sk-video
+      pip install cmake
+      pip install dlib
+      pip install scikit-image
+      pip install -e .
+
+运行预测脚本（修改路径为自己的）
+python "evaluation/predict.py" "C:/Projects/lipnet/evaluation/models/overlapped-weights368.h5" "C:/Projects/lipnet/evaluation/samples/id23_vcd_priazn.mpg"
+能看到输出下面内容就ok了。
+ __                   __  __          __
+/\ \       __        /\ \/\ \        /\ \__
+\ \ \     /\_\  _____\ \ `\\ \     __\ \ ,_\
+ \ \ \  __\/\ \/\ '__`\ \ , ` \  /'__`\ \ \/
+  \ \ \L\ \\ \ \ \ \L\ \ \ \`\ \/\  __/\ \ \_
+   \ \____/ \ \_\ \ ,__/\ \_\ \_\ \____\\ \__\
+    \/___/   \/_/\ \ \/  \/_/\/_/\/____/ \/__/
+                  \ \_\
+                   \/_/
+
+             --------------------------
+[ DECODED ] |> set red at i nine again |
+             --------------------------
