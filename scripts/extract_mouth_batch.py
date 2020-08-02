@@ -44,7 +44,6 @@ for filepath in find_files(SOURCE_PATH, SOURCE_EXTS):
     print ("Processing: {}".format(filepath))
     
     video = Video(vtype='face', face_predictor_path=FACE_PREDICTOR_PATH).from_video(filepath)
-    
 
     filepath_wo_ext = os.path.splitext(filepath)[0]
     target_dir = os.path.join(TARGET_PATH, filepath_wo_ext)

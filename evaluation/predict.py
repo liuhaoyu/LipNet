@@ -18,7 +18,7 @@ FACE_PREDICTOR_PATH = os.path.join(CURRENT_PATH,'..','common','predictors','shap
 
 PREDICT_GREEDY      = False
 PREDICT_BEAM_WIDTH  = 200
-PREDICT_DICTIONARY  = os.path.join(CURRENT_PATH,'..','common','dictionaries','LRS2.txt')
+PREDICT_DICTIONARY  = os.path.join(CURRENT_PATH,'..','common','dictionaries','GRID.txt')
 
 def predict(weight_path, video_path, absolute_max_string_len=32, output_size=28):
     print ("\nLoading data from disk...")

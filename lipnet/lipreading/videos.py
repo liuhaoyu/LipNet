@@ -7,6 +7,8 @@ import skvideo.io
 import dlib
 from lipnet.lipreading.aligns import Align
 from matplotlib.pyplot import imread
+
+MAX_FRAME_COUNT = 154
 class VideoAugmenter(object):
     @staticmethod
     def split_words(video, align):
@@ -137,6 +139,9 @@ class Video(object):
         detector = dlib.get_frontal_face_detector()
         predictor = dlib.shape_predictor(self.face_predictor_path)
         mouth_frames = self.get_frames_mouth(detector, predictor, frames)
+        frame_count, frame_width, frame_height = np.shape(mouth_frames)[:3]
+        buf = np.zeros((MAX_FRAME_COUNT - frame_count, frame_width, frame_height, 3), np.dtype('uint8'))
+        mouth_frames = np.concatenate((mouth_frames, buf))
         self.face = np.array(frames)
         self.mouth = np.array(mouth_frames)
         self.set_data(mouth_frames)
@@ -193,7 +198,7 @@ class Video(object):
 
     def get_video_frames(self, path):
         videogen = skvideo.io.vreader(path)
-        frames = np.array([frame for frame in videogen])
+        frames = np.array([frame for frame in videogen])       
         return frames
 
     def set_data(self, frames):
