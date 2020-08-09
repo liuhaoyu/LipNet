@@ -17,6 +17,7 @@ Example:
 from lipnet.lipreading.videos import Video
 import os, fnmatch, sys, errno, time
 from skimage import io
+import numpy as np
 
 SOURCE_PATH = sys.argv[1]
 SOURCE_EXTS = sys.argv[2]
@@ -44,8 +45,9 @@ for filepath in find_files(SOURCE_PATH, SOURCE_EXTS):
     print ("Processing: {}".format(filepath))
     
     video = Video(vtype='face', face_predictor_path=FACE_PREDICTOR_PATH).from_video(filepath)
-
-    filepath_wo_ext = os.path.splitext(filepath)[0]
+    if np.shape(video.mouth) != (154, 50, 100, 3):
+        continue
+    filepath_wo_ext = os.path.splitext(filepath)[0][-5:]
     target_dir = os.path.join(TARGET_PATH, filepath_wo_ext)
     mkdir_p(target_dir)
 

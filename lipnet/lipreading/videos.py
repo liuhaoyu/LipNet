@@ -140,8 +140,9 @@ class Video(object):
         predictor = dlib.shape_predictor(self.face_predictor_path)
         mouth_frames = self.get_frames_mouth(detector, predictor, frames)
         frame_count, frame_width, frame_height = np.shape(mouth_frames)[:3]
-        buf = np.zeros((MAX_FRAME_COUNT - frame_count, frame_width, frame_height, 3), np.dtype('uint8'))
-        mouth_frames = np.concatenate((mouth_frames, buf))
+        if frame_count < MAX_FRAME_COUNT:
+            buf = np.zeros((MAX_FRAME_COUNT - frame_count, frame_width, frame_height, 3), np.dtype('uint8'))
+            mouth_frames = np.concatenate((mouth_frames, buf))
         self.face = np.array(frames)
         self.mouth = np.array(mouth_frames)
         self.set_data(mouth_frames)

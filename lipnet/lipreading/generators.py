@@ -81,31 +81,33 @@ class BasicGenerator(keras.callbacks.Callback):
 
     def enumerate_videos(self, path):
         video_list = []
-        for video_path in glob.glob(path):
-            try:
-                if os.path.isfile(video_path):
-                    video = Video(self.vtype, self.face_predictor_path).from_video(video_path)
-                else:
-                    video = Video(self.vtype, self.face_predictor_path).from_frames(video_path)
-            except AttributeError as err:
-                raise err
-            except:
-                print ("Error loading video: "+video_path)
-                continue
-            if K.image_data_format() == 'channels_first' and video.data.shape != (self.img_c,self.frames_n,self.img_w,self.img_h):
-                print ("Video "+video_path+" has incorrect shape "+str(video.data.shape)+", must be "+str((self.img_c,self.frames_n,self.img_w,self.img_h))+"")
-                continue
-            if K.image_data_format() != 'channels_first' and video.data.shape != (self.frames_n,self.img_w,self.img_h,self.img_c):
-                print ("Video "+video_path+" has incorrect shape "+str(video.data.shape)+", must be "+str((self.frames_n,self.img_w,self.img_h,self.img_c))+"")
-                continue
-            video_list.append(video_path)
+        for dir in glob.glob(path):
+            for path in os.listdir(dir):
+                video_path = os.path.join(dir, path)
+                try:
+                    if os.path.isfile(video_path):
+                        video = Video(self.vtype, self.face_predictor_path).from_video(video_path)
+                    else:
+                        video = Video(self.vtype, self.face_predictor_path).from_frames(video_path)
+                except AttributeError as err:
+                    raise err
+                except:
+                    print ("Error loading video: " + video_path)
+                    continue
+                if K.image_data_format() == 'channels_first' and video.data.shape != (self.img_c,self.frames_n,self.img_w,self.img_h):
+                    print ("Video "+video_path+" has incorrect shape "+str(video.data.shape)+", must be "+str((self.img_c,self.frames_n,self.img_w,self.img_h))+"")
+                    continue
+                if K.image_data_format() != 'channels_first' and video.data.shape != (self.frames_n,self.img_w,self.img_h,self.img_c):
+                    print ("Video "+video_path+" has incorrect shape "+str(video.data.shape)+", must be "+str((self.frames_n,self.img_w,self.img_h,self.img_c))+"")
+                    continue
+                video_list.append(video_path)
         return video_list
 
     def enumerate_align_hash(self, video_list):
         align_hash = {}
         for video_path in video_list:
             video_id = os.path.split(video_path)[1]
-            align_path = os.path.join(self.align_path, video_id)+".align"
+            align_path = os.path.join(self.align_path, os.path.split(os.path.split(video_path)[0])[1], video_id) + ".align"
             align_hash[video_id] = Align(self.absolute_max_string_len, text_to_labels).from_file(align_path)
         return align_hash
 
