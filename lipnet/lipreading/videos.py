@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import cv2
 from tensorflow.keras import backend as K
 from scipy import ndimage
 from skimage import transform
@@ -143,6 +144,9 @@ class Video(object):
         if frame_count < MAX_FRAME_COUNT:
             buf = np.zeros((MAX_FRAME_COUNT - frame_count, frame_width, frame_height, 3), np.dtype('uint8'))
             mouth_frames = np.concatenate((mouth_frames, buf))
+#option to grayscale the image
+#        for fc in range(MAX_FRAME_COUNT):
+#            mouth_frames[fc] = cv2.cvtColor(mouth_frames[fc], cv2.COLOR_BGR2GRAY)
         self.face = np.array(frames)
         self.mouth = np.array(mouth_frames)
         self.set_data(mouth_frames)

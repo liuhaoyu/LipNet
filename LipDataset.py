@@ -10,6 +10,19 @@ MAX_FRAME_COUNT = 154
 
 
 class LipDataset():
+    def rgb2gray(video_path):
+        video_tensor = []
+        capture = cv2.VideoCapture(video_path)
+        ret, frame = capture.read()
+        while(True):
+            ret, frame = capture.read()
+            grayFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            video_tensor.append(grayFrame)
+        return video_tensor
+
+      
+    if cv2.waitKey(1) == 27:
+        break
     def write(output_path,text_path):
         text_file = open(text_path, "r")
         text = text_file.readlines()[4:]
